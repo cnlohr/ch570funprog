@@ -8,6 +8,8 @@
 
 // Allow reading and writing to the scratchpad via HID control messages.
 __attribute__ ((aligned(4))) uint8_t scratch[264];
+__attribute__ ((aligned(4))) uint8_t retbuff[264];
+
 volatile uint32_t usb_pending = 0;
 volatile uint32_t scratch_return = 0;
 
@@ -16,13 +18,14 @@ volatile uint32_t scratch_return = 0;
 int doreboot = 0;
 uint32_t rebootat = 0;
 
-int lrx = 0;
+int missed, hit;
 
 int HandleHidUserSetReportSetup( struct _USBState * ctx, tusb_control_request_t * req )
 {
 	int id = req->wValue & 0xff;
 	if( ( id >= 0xaa && id <= 0xae ) && req->wLength <= sizeof(scratch) )
 	{
+		if( usb_pending ) return 0;
 		ctx->pCtrlPayloadPtr = scratch;
 		usb_pending = req->wLength;
 		return req->wLength;
@@ -43,14 +46,17 @@ int HandleHidUserGetReportSetup( struct _USBState * ctx, tusb_control_request_t 
 	{
 		if( scratch_return )
 		{
-			ctx->pCtrlPayloadPtr = scratch;
-			if( sizeof(scratch) - 1 < lrx )
-				return sizeof(scratch) - 1;
+			hit++;
+			scratch_return = 0;
+			ctx->pCtrlPayloadPtr = retbuff;
+			if( sizeof(retbuff) - 1 < req->wLength )
+				return sizeof(retbuff) - 1;
 			else
-				return lrx;
+				return req->wLength;
 		}
 		else
 		{
+			missed++;
 			return 0;
 		}
 	}
@@ -129,13 +135,14 @@ static __attribute__((noreturn)) void processLoop()
 
 		if( usb_pending && !USBFSCTX.pCtrlPayloadPtr )
 		{
-			printf( "Scratch run %d\n", (int)usb_pending );
 			scratch_return = 0;
+			//printf( "+%02x %02x %02x %02x %02x\n", scratch[0], scratch[1], scratch[2], scratch[3], scratch[4] );
 			HandleCommandBuffer( scratch );
+			//printf( "-%02x %02x %02x %02x %02x\n", scratch[0], scratch[1], scratch[2], scratch[3], scratch[4] );
 			usb_pending = 0;
 			scratch_return = 1;
 		}
-
+		//printf( "%d %d\n", missed, hit );
 
 	}
 }
