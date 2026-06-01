@@ -6,37 +6,25 @@
 #define LED PA7
 #define LED_ON 0
 
-//#define POWER_IO    PA7
-//#define SWC_IO      PA3
-//#define SWD_IO      PA2
+// Allow reading and writing to the scratchpad via HID control messages.
+__attribute__ ((aligned(4))) uint8_t scratch[264];
+volatile uint32_t usb_pending = 0;
+volatile uint32_t scratch_return = 0;
 
-#define BB_PRINTF_DEBUG(x...) printf( x )
-#define IRAM_ATTR __HIGH_CODE
+#include "the_programmer_from_ch32fun_rvswdio.h"
 
-#include "bitbang_rvswdio.h"
-#include "bitbang_rvswdio_ch57x.h"
-
-uint32_t count;
 int doreboot = 0;
 uint32_t rebootat = 0;
-int last = 0;
-
-void handle_debug_input( int numbytes, uint8_t * data )
-{
-	last = data[0];
-	count += numbytes;
-}
 
 int lrx = 0;
-uint8_t scratchpad[256];
 
 int HandleHidUserSetReportSetup( struct _USBState * ctx, tusb_control_request_t * req )
 {
 	int id = req->wValue & 0xff;
-	if( id == 0xaa && req->wLength <= sizeof(scratchpad) )
+	if( ( id >= 0xaa && id <= 0xae ) && req->wLength <= sizeof(scratch) )
 	{
-		ctx->pCtrlPayloadPtr = scratchpad;
-		lrx = req->wLength;
+		ctx->pCtrlPayloadPtr = scratch;
+		usb_pending = req->wLength;
 		return req->wLength;
 	}
 	return 0;
@@ -48,16 +36,27 @@ int HandleHidUserGetReportSetup( struct _USBState * ctx, tusb_control_request_t 
 	switch( id )
 	{
 	case 0xaa:
+	case 0xab:
+	case 0xac:
+	case 0xad:
+	case 0xae:
 	{
-		ctx->pCtrlPayloadPtr = scratchpad;
-		if( sizeof(scratchpad) - 1 < lrx )
-			return sizeof(scratchpad) - 1;
+		if( scratch_return )
+		{
+			ctx->pCtrlPayloadPtr = scratch;
+			if( sizeof(scratch) - 1 < lrx )
+				return sizeof(scratch) - 1;
+			else
+				return lrx;
+		}
 		else
-			return lrx;
+		{
+			return 0;
+		}
 	}
 	case 0xe2: // Copy the printf debug buffer out of DMDATA0.
-		memcpy( scratchpad, (char*)DMDATA0, 8 );
-		ctx->pCtrlPayloadPtr = scratchpad;
+		memcpy( scratch, (char*)DMDATA0, 8 );
+		ctx->pCtrlPayloadPtr = scratch;
 		*DMDATA0 = 0;
 		return 8;
 	}
@@ -111,6 +110,7 @@ static __attribute__((noreturn)) void processLoop()
 			}
 		}
 
+/*
 		struct SWIOState st;
 		int r;
 		r = InitializeSWDSWIO( &st );
@@ -123,17 +123,19 @@ static __attribute__((noreturn)) void processLoop()
 			uint32_t esig = 0;
 			r = ReadWord( &st, 0x1FFFF7E0, &esig );
 			printf( "ESIG: %d %08x\n", r, (int)esig );
-/*			r = ReadWord( &st, 0x1FFFF7E4, &esig );
-			printf( "  e4: %d %08x\n", r, (int)esig );
-			r = ReadWord( &st, 0x1FFFF7E8, &esig );
-			printf( "UNIID1: %d %08x\n", r, (int)esig );
-			r = ReadWord( &st, 0x1FFFF7EC, &esig );
-			printf( "UNIID2: %d %08x\n", r, (int)esig );
-			r = ReadWord( &st, 0x1FFFF7F0, &esig );
-			printf( "UNIID3: %d %08x\n", r, (int)esig );
-*/
 		}
 		Delay_Ms(100);
+*/
+
+		if( usb_pending && !USBFSCTX.pCtrlPayloadPtr )
+		{
+			printf( "Scratch run %d\n", (int)usb_pending );
+			scratch_return = 0;
+			HandleCommandBuffer( scratch );
+			usb_pending = 0;
+			scratch_return = 1;
+		}
+
 
 	}
 }

@@ -25,10 +25,10 @@
 #include "usb_defines.h"
 
 #define FUSB_USB_VID 0x1209
-#define FUSB_USB_PID 0xd035
+#define FUSB_USB_PID 0x570f
 #define FUSB_USB_REV 0x0007
 #define FUSB_STR_MANUFACTURER u"ch32fun"
-#define FUSB_STR_PRODUCT      u"HID example device"
+#define FUSB_STR_PRODUCT      u"ch570 funprog"
 #define FUSB_STR_SERIAL       u"007"
 
 //Taken from http://www.usbmadesimple.co.uk/ums_ms_desc_dev.htm
@@ -54,21 +54,36 @@ static const uint8_t HIDAPIRepDesc[ ] =
 {
 	HID_USAGE_PAGE ( 0xff ), // Vendor-defined page.
 	HID_USAGE      ( 0x00 ),
-	HID_REPORT_SIZE ( 64 ),
+	HID_REPORT_SIZE ( 8 ),
 	HID_COLLECTION ( HID_COLLECTION_LOGICAL ),
-		HID_REPORT_COUNT   ( 254 ),
+		HID_REPORT_COUNT   ( 7 ),
 		HID_REPORT_ID      ( 0xaa )
 		HID_USAGE          ( 0x01 ),
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
+		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+		HID_REPORT_COUNT   ( 127 ),
+		HID_REPORT_ID      ( 0xac )
+		HID_USAGE          ( 0x01 ),
+		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+		HID_REPORT_COUNT   ( 78 ),
+		HID_REPORT_ID      ( 0xad )
+		HID_USAGE          ( 0x01 ),
+		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+		HID_REPORT_COUNT_N ( 263, 2 ),
+		HID_REPORT_ID      ( 0xae )
+		HID_USAGE          ( 0x01 ),
+		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+
 		HID_REPORT_COUNT   ( 63 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
 		HID_REPORT_ID      ( 0xab )
 		HID_USAGE          ( 0x01 ),	
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
-		HID_REPORT_COUNT   ( 8 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
+
+		// for reboot or internal terminal.
+		HID_REPORT_COUNT   ( 8 ),
 		HID_REPORT_ID      ( 0xe2 )
 		HID_USAGE          ( 0x01 ),	
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
-		HID_REPORT_COUNT   ( 8 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
+		HID_REPORT_COUNT   ( 8 ),
 		HID_REPORT_ID      ( 0xe1 )
 		HID_USAGE          ( 0x01 ),	
 		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,

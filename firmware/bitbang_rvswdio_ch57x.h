@@ -51,12 +51,12 @@ static inline void Send0Bit(void)
 static inline int ReadBit(void)
 {
 	R32_PA_CLR = PIN_SWD;
-	Delay_Tiny_Inline( 2 ); // XXX TODO
+	Delay_Tiny_Inline( 2 );
 	R32_PA_DIR &= ~PIN_SWD;
-	Delay_Tiny_Inline( 5 ); // XXX TODO
+	Delay_Tiny_Inline( 5 );
 	int r = !!(R32_PA_PIN&PIN_SWD);
 	R32_PA_SET = PIN_SWD;
-	Delay_Tiny_Inline( 12 ); // XXX TODO
+	Delay_Tiny_Inline( 12 );
 	R32_PA_DIR |= PIN_SWD;
 	return r;
 }
