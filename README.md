@@ -7,6 +7,7 @@ CH570-based programmer for CH32 microcontrollers.
 ### General Game Plan
 
 - [x] Be a cheap, minichlink-compatible programmer programming over USB
+- [x] Test on ch32v00x for SWIO mode (and tune)
 - [ ] Test on more boards (And tune SWD)
 - [ ] Be a iSLER gateway.
 - [ ] Enable flashing of slave processors over iSLER.
