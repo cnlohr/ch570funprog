@@ -18,6 +18,8 @@ volatile uint32_t scratch_return = 0;
 int doreboot = 0;
 uint32_t rebootat = 0;
 
+int didnak;
+
 int missed, hit;
 
 int HandleHidUserSetReportSetup( struct _USBState * ctx, tusb_control_request_t * req )
@@ -57,6 +59,7 @@ int HandleHidUserGetReportSetup( struct _USBState * ctx, tusb_control_request_t 
 		else
 		{
 			missed++;
+			didnak = req->wLength;
 			return 0;
 		}
 	}
@@ -66,7 +69,7 @@ int HandleHidUserGetReportSetup( struct _USBState * ctx, tusb_control_request_t 
 		*DMDATA0 = 0;
 		return 8;
 	}
-	return 0;
+	return -1;
 }
 
 void HandleHidUserReportDataOut( struct _USBState * ctx, uint8_t * data, int len )
@@ -133,17 +136,44 @@ static __attribute__((noreturn)) void processLoop()
 		Delay_Ms(100);
 */
 
+
 		if( usb_pending && !USBFSCTX.pCtrlPayloadPtr )
 		{
 			scratch_return = 0;
 			//printf( "+%02x %02x %02x %02x %02x\n", scratch[0], scratch[1], scratch[2], scratch[3], scratch[4] );
 			HandleCommandBuffer( scratch );
 			//printf( "-%02x %02x %02x %02x %02x\n", scratch[0], scratch[1], scratch[2], scratch[3], scratch[4] );
+
+			__disable_irq();
+			if( didnak )
+			{
+				struct _USBState * ctx = &USBFSCTX;
+
+				int len = didnak;
+
+				if( sizeof(retbuff) - 1 < len )
+					len = sizeof(retbuff) - 1;
+
+				ctx->pCtrlPayloadPtr = retbuff;
+
+				ctx->USBFS_SetupReqLen = len;
+				len = len >= DEF_USBD_UEP0_SIZE ? DEF_USBD_UEP0_SIZE : len;
+
+				uint8_t * ctrl0buff = CTRL0BUFF;
+				copyBuffer( ctrl0buff, ctx->pCtrlPayloadPtr, len );
+				ctx->pCtrlPayloadPtr += len;
+
+				UEP_CTRL_LEN(0) = len;
+				UEP_CTRL_TX(0) = CHECK_USBFS_UEP_T_AUTO_TOG | USBFS_UEP_T_RES_ACK | USBFS_UEP_T_TOG;
+				ctx->USBFS_SetupReqLen -= len;
+
+				didnak = 0;
+			}
+			__enable_irq();
+
 			usb_pending = 0;
 			scratch_return = 1;
 		}
-		//printf( "%d %d\n", missed, hit );
-
 	}
 }
 
