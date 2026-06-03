@@ -74,7 +74,7 @@
 			(mirror no)
 			(drillshape 0)
 			(scaleselection 1)
-			(outputdirectory "ch570funprog-rev-")
+			(outputdirectory "ch570funprog-revA")
 		)
 	)
 	(net 0 "")
@@ -320,13 +320,14 @@
 		(descr "USB Type-C receptacle for USB 2.0 and PD, http://www.krhro.com/uploads/soft/180320/1-1P320120243.pdf")
 		(tags "usb usb-c 2.0 pd")
 		(property "Reference" "J1"
-			(at 0 -5.645 90)
+			(at 4.26 -4.89 90)
 			(layer "F.SilkS")
 			(uuid "7d6671f4-cc42-4772-8b7b-002c2adcb367")
 			(effects
 				(font
-					(size 1 1)
-					(thickness 0.15)
+					(size 0.65 0.65)
+					(thickness 0.12)
+					(bold yes)
 				)
 			)
 		)
@@ -3910,6 +3911,17 @@
 				(xyz 0 0 0)
 			)
 		)
+		(model "${KICAD9_3DMODEL_DIR}/Package_DFN_QFN.3dshapes/DFN-10-1EP_3x3mm_P0.5mm_EP1.55x2.48mm.step"
+			(offset
+				(xyz 0 0 0)
+			)
+			(scale
+				(xyz 1 1 1)
+			)
+			(rotate
+				(xyz 0 0 0)
+			)
+		)
 	)
 	(footprint "LED_SMD:LED_0603_1608Metric"
 		(layer "F.Cu")
@@ -6690,6 +6702,17 @@
 		(layer "B.Cu")
 		(uuid "dd1d7e56-0c7a-4397-ab91-811e849354b5")
 	)
+	(gr_circle
+		(center 137.31 80.46)
+		(end 137.45 80.56)
+		(stroke
+			(width 0.2)
+			(type solid)
+		)
+		(fill no)
+		(layer "F.SilkS")
+		(uuid "2a140f90-2344-4533-b302-79f69c66eaed")
+	)
 	(gr_arc
 		(start 120 77.6)
 		(mid 120.43934 76.53934)
@@ -9409,7 +9432,7 @@
 		(uuid "0ee17db3-9825-03f6-3ca4-2450595cce81")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30040)
+		(priority 30001)
 		(attr
 			(teardrop
 				(type padvia)
@@ -10085,7 +10108,7 @@
 		(uuid "4e3fb2b4-e1a9-0d09-22e6-c44040b1a016")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30041)
+		(priority 30002)
 		(attr
 			(teardrop
 				(type padvia)
@@ -10485,7 +10508,7 @@
 		(uuid "82232c46-6006-0e58-08a2-ca5bb79782c0")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30042)
+		(priority 30003)
 		(attr
 			(teardrop
 				(type padvia)
@@ -10646,7 +10669,7 @@
 		(uuid "91c76a0a-0320-00c4-028a-4e684607d75b")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30046)
+		(priority 30007)
 		(attr
 			(teardrop
 				(type padvia)
@@ -10966,7 +10989,7 @@
 		(uuid "d320d5b5-d372-010a-22d7-cb7e480f3bdb")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30045)
+		(priority 30006)
 		(attr
 			(teardrop
 				(type padvia)
@@ -11086,7 +11109,7 @@
 		(uuid "e65e7d30-c1d2-0201-0083-8df6798283c6")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30039)
+		(priority 30000)
 		(attr
 			(teardrop
 				(type padvia)
@@ -11166,7 +11189,7 @@
 		(uuid "eb3ab44e-e834-02ab-36cf-0e9b6b144d26")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30047)
+		(priority 30008)
 		(attr
 			(teardrop
 				(type padvia)
@@ -11246,7 +11269,7 @@
 		(uuid "f5f46d88-8373-0545-1a36-776c3f0652e8")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30043)
+		(priority 30004)
 		(attr
 			(teardrop
 				(type padvia)
@@ -11285,7 +11308,7 @@
 		(uuid "f6791671-6cbf-0440-0a45-e59585443e76")
 		(name "$teardrop_padvia$")
 		(hatch none 0.1)
-		(priority 30044)
+		(priority 30005)
 		(attr
 			(teardrop
 				(type padvia)

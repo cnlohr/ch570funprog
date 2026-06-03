@@ -3,9 +3,6 @@
 // If you want the most up-to-date version of this, it will be stored in rv003usb.
 //
 
-#define PIN_SWD PA2
-#define PIN_SWC PA3
-
 #define SWD_DELAY ADD_N_NOPS( 5 );
 
 #ifndef _BITBANG_RVSWDIO_CH570_H

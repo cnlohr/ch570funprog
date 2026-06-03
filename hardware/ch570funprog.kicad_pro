@@ -500,8 +500,8 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "ch570funprog-rev-",
-      "pos_files": "ch570funprog-rev-",
+      "plot": "ch570funprog-revA",
+      "pos_files": "ch570funprog-revA",
       "specctra_dsn": "",
       "step": "",
       "svg": "",
@@ -511,7 +511,7 @@
   },
   "schematic": {
     "annotate_start_num": 0,
-    "bom_export_filename": "ch570funprog-rev-/${PROJECTNAME}.csv",
+    "bom_export_filename": "ch570funprog-revA/${PROJECTNAME}.csv",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",

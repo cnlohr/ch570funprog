@@ -7478,7 +7478,7 @@
 	)
 	(symbol
 		(lib_id "Connector_Generic:Conn_01x04")
-		(at 274.32 102.87 0)
+		(at 162.56 100.33 0)
 		(mirror x)
 		(unit 1)
 		(exclude_from_sim no)
@@ -7487,7 +7487,7 @@
 		(dnp no)
 		(uuid "fbdd9c19-1b12-4dc7-88f2-94038b94257e")
 		(property "Reference" "J3"
-			(at 276.86 102.8701 0)
+			(at 165.1 100.3301 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7496,7 +7496,7 @@
 			)
 		)
 		(property "Value" "DEVPGM"
-			(at 276.86 100.3301 0)
+			(at 165.1 97.7901 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7505,7 +7505,7 @@
 			)
 		)
 		(property "Footprint" "Connector_PinHeader_2.54mm:PinHeader_1x04_P2.54mm_Vertical"
-			(at 274.32 102.87 0)
+			(at 162.56 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7514,7 +7514,7 @@
 			)
 		)
 		(property "Datasheet" "~"
-			(at 274.32 102.87 0)
+			(at 162.56 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7523,7 +7523,7 @@
 			)
 		)
 		(property "Description" "Generic connector, single row, 01x04, script generated (kicad-library-utils/schlib/autogen/connector/)"
-			(at 274.32 102.87 0)
+			(at 162.56 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -7532,7 +7532,7 @@
 			)
 		)
 		(property "LCSC" "C91552"
-			(at 274.32 102.87 0)
+			(at 162.56 100.33 0)
 			(effects
 				(font
 					(size 1.27 1.27)

@@ -3,8 +3,19 @@
 #include <string.h>
 #include "fsusb.h"
 
+
+#define PIN_SWD PA2
+#define PIN_SWC PA3
+
 #define LED PA7
 #define LED_ON 0
+#define PIN_TARGETPOWER PA7
+
+#define POWER_ON 0
+#define POWER_OFF 1
+#define PIN_TARGETPOWER_MODE GPIO_CFGLR_OUT_10Mhz_PP
+
+
 
 // Allow reading and writing to the scratchpad via HID control messages.
 __attribute__ ((aligned(4))) uint8_t scratch[264];
