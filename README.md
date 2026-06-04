@@ -1,5 +1,7 @@
 # ch570funprog
 
+Project Status: It works, in a pinch, but hardware and software is still evolving.
+
 CH570-based programmer for CH32 microcontrollers.
 
 <img width="1883" height="935" alt="Image" src="https://github.com/user-attachments/assets/37eef7a6-dd0e-41a3-9c07-9184f502477f" />
