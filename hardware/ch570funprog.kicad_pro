@@ -695,16 +695,16 @@
       {
         "filename": "ch570funprog.kicad_sch",
         "name": "ch570funprog",
-        "uuid": "00000000-0000-0000-0000-000000000000"
+        "uuid": "8b3ca9c1-ec01-472e-975f-b13c767b5c47"
       }
     ],
-    "used_designators": "",
+    "used_designators": "H1-2",
     "variants": []
   },
   "sheets": [
     [
       "8b3ca9c1-ec01-472e-975f-b13c767b5c47",
-      "Root"
+      "ch570funprog"
     ]
   ],
   "text_variables": {},
