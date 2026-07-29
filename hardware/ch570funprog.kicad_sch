@@ -3526,6 +3526,12 @@
 		(uuid "0d4ea411-cc99-4da0-97bb-c6645f9ad16f")
 	)
 	(junction
+		(at 68.58 55.88)
+		(diameter 0)
+		(color 0 0 0 0)
+		(uuid "567e8760-2bea-45ea-a912-07a90fbc1431")
+	)
+	(junction
 		(at 77.47 63.5)
 		(diameter 0)
 		(color 0 0 0 0)
@@ -3575,7 +3581,7 @@
 	)
 	(wire
 		(pts
-			(xy 66.04 55.88) (xy 72.39 55.88)
+			(xy 66.04 55.88) (xy 68.58 55.88)
 		)
 		(stroke
 			(width 0)
@@ -3812,6 +3818,16 @@
 			(type default)
 		)
 		(uuid "bedcdbc0-457b-4452-9d4f-b49e484a9dff")
+	)
+	(wire
+		(pts
+			(xy 68.58 55.88) (xy 72.39 55.88)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "bfd052eb-caab-4b0b-b1da-4bd85b7df3c7")
 	)
 	(wire
 		(pts
@@ -4266,30 +4282,6 @@
 		(uuid "adebd3f6-d8b5-435b-ab01-dd8912b9abde")
 		(property "Intersheetrefs" "${INTERSHEET_REFS}"
 			(at 225.252 106.68 0)
-			(hide yes)
-			(show_name no)
-			(do_not_autoplace no)
-			(effects
-				(font
-					(size 1.27 1.27)
-				)
-				(justify right)
-			)
-		)
-	)
-	(global_label "VDDUC"
-		(shape input)
-		(at 66.04 55.88 180)
-		(fields_autoplaced yes)
-		(effects
-			(font
-				(size 1.27 1.27)
-			)
-			(justify right)
-		)
-		(uuid "b167c0b3-1885-4c2d-994d-9818d429e81c")
-		(property "Intersheetrefs" "${INTERSHEET_REFS}"
-			(at 56.8257 55.88 0)
 			(hide yes)
 			(show_name no)
 			(do_not_autoplace no)
@@ -4786,6 +4778,84 @@
 			(project "ch570funprog"
 				(path "/8b3ca9c1-ec01-472e-975f-b13c767b5c47"
 					(reference "R7")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "power:+5V")
+		(at 68.58 55.88 0)
+		(unit 1)
+		(body_style 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(in_pos_files yes)
+		(dnp no)
+		(uuid "143bc0c4-8ade-4ce3-bc43-a05160bf367a")
+		(property "Reference" "#PWR026"
+			(at 68.58 59.69 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "+5V"
+			(at 68.58 48.768 90)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(justify right)
+			)
+		)
+		(property "Footprint" ""
+			(at 68.58 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Datasheet" ""
+			(at 68.58 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Description" ""
+			(at 68.58 55.88 0)
+			(hide yes)
+			(show_name no)
+			(do_not_autoplace no)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "e50ef5ab-9e0d-48dd-96f7-f46c8dcd567d")
+		)
+		(instances
+			(project "ch570funprog"
+				(path "/8b3ca9c1-ec01-472e-975f-b13c767b5c47"
+					(reference "#PWR026")
 					(unit 1)
 				)
 			)
