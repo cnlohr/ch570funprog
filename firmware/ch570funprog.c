@@ -1,6 +1,7 @@
 #include "ch32fun.h"
 #include <stdio.h>
 #include <string.h>
+
 #include "fsusb.h"
 
 
@@ -171,7 +172,7 @@ static __attribute__((noreturn)) void processLoop()
 				len = len >= DEF_USBD_UEP0_SIZE ? DEF_USBD_UEP0_SIZE : len;
 
 				uint8_t * ctrl0buff = CTRL0BUFF;
-				copyBuffer( ctrl0buff, ctx->pCtrlPayloadPtr, len );
+				memcpy( ctrl0buff, ctx->pCtrlPayloadPtr, len );
 				ctx->pCtrlPayloadPtr += len;
 
 				UEP_CTRL_LEN(0) = len;

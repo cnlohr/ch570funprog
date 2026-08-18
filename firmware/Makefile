@@ -2,6 +2,7 @@ all : flash
 
 TARGET:=ch570funprog
 TARGET_MCU:=CH570
+ADDITIONAL_C_FILES:=../ch32fun/extralibs/fsusb.c
 include ../ch32fun/ch32fun/ch32fun.mk
 
 install_udev_rules : 
@@ -10,7 +11,7 @@ install_udev_rules :
 	sudo udevadm trigger
 
 
-freshflash :
+flash_fresh :
 	$(MINICHLINK)/minichlink -P
 	make all
 
@@ -19,9 +20,9 @@ freshflash :
 go_into_bootloader :
 	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_device/usbhidtool && make VID=1209 PID=570f go_into_bootloader && cd .. )
 
-userflash : go_into_bootloader flash
+flash_self : go_into_bootloader flash
 
-usermonitor :
+monitor_self :
 	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_device/usbhidtool && make VID=1209 PID=570f  usermonitor && cd .. )
 
 flash : cv_flash

@@ -4,7 +4,8 @@
 #include "funconfig.h"
 #include "ch32fun.h"
 
-#define FUSB_CONFIG_EPS       2 // Include EP0 in this count
+#define FUSB_BUFFERS_NUMBER   2 // Number of EP buffers (one for EP0, one per each IN/OUT, two for double)
+
 #define FUSB_EP1_MODE         1 // TX (IN)
 #define FUSB_EP2_MODE         -1 // RX (OUT)
 #define USB_EP_TX             1
