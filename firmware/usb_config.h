@@ -6,7 +6,7 @@
 
 #define FUSB_BUFFERS_NUMBER   2 // Number of EP buffers (one for EP0, one per each IN/OUT, two for double)
 
-#define FUSB_EP1_MODE         FUSB_MODE_TX // TX (IN)
+#define FUSB_EP1_MODE         USBFS_EP_MODE_TX // TX (IN)
 #define USB_EP_TX             1
 #define FUSB_SUPPORTS_SLEEP   0
 #define FUSB_IO_PROFILE       0
@@ -110,7 +110,7 @@ static const uint8_t config_descriptor[ ] =
     0x01,                                                   // bNumEndpoints
     0x03,                                                   // bInterfaceClass
     0x00,                                                   // bInterfaceSubClass
-    0xff,                                                   // bInterfaceProtocol: OTher
+    0xff,                                                   // bInterfaceProtocol: Other
     0x00,                                                   // iInterface
 
     /* HID Descriptor (HIDAPI) */

@@ -192,6 +192,7 @@ static __attribute__((noreturn)) void processLoop()
 		if( buffer )
 		{
 			buffer[0] = 0;
+			buffer[1] = 0;
 			USBFS_SendEndpoint( USB_EP_TX, 8 /* data length */ );
 		}
 	}
@@ -206,9 +207,6 @@ int main()
 	funGpioInitAll();
 
 	// Force reset.
-	funPinMode( PA0, GPIO_CFGLR_OUT_10Mhz_PP );
-	funPinMode( PA1, GPIO_CFGLR_OUT_10Mhz_PP );
-
 	funPinMode( LED, GPIO_CFGLR_OUT_10Mhz_PP );
 	funDigitalWrite( LED, !LED_ON );
 
