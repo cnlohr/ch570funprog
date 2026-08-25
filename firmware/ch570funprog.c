@@ -19,8 +19,8 @@
 
 
 // Allow reading and writing to the scratchpad via HID control messages.
-__attribute__ ((aligned(4))) uint8_t scratch[264];
-__attribute__ ((aligned(4))) uint8_t retbuff[264];
+__attribute__ ((aligned(4))) uint8_t scratch[511];
+__attribute__ ((aligned(4))) uint8_t retbuff[511];
 
 volatile uint32_t usb_pending = 0;
 volatile uint32_t scratch_return = 0;
@@ -91,7 +91,7 @@ void HandleHidUserReportDataOut( struct _USBState * ctx, uint8_t * data, int len
 	case 0xe1:
 		if( len > 7 )
 		{
-			if( strncmp( (char*)(data+1), "\xbe\xef\x00\xc0\x01\xd0\x0d", 7 ) == 0 )
+			if( memcmp( (char*)(data+1), "\xbe\xef\x00\xc0\x01\xd0\x0d", 7 ) == 0 )
 			{
 				doreboot = 2;
 				rebootat = SysTick->CNTL + 1000000;
@@ -103,6 +103,7 @@ void HandleHidUserReportDataOut( struct _USBState * ctx, uint8_t * data, int len
 
 int HandleHidUserReportDataIn( struct _USBState * ctx, uint8_t * data, int len )
 {
+	memset( data, 0, len );
 	return len;
 }
 
@@ -182,9 +183,16 @@ static __attribute__((noreturn)) void processLoop()
 				didnak = 0;
 			}
 			__enable_irq();
-
 			usb_pending = 0;
 			scratch_return = 1;
+		}
+
+		// To service interrupt endpoint
+		uint32_t * buffer = (uint32_t*)USBFS_GetEPBufferIfAvailable( USB_EP_TX );
+		if( buffer )
+		{
+			buffer[0] = 0;
+			USBFS_SendEndpoint( USB_EP_TX, 8 /* data length */ );
 		}
 	}
 }
@@ -196,6 +204,10 @@ int main()
 	SystemInit();
 
 	funGpioInitAll();
+
+	// Force reset.
+	funPinMode( PA0, GPIO_CFGLR_OUT_10Mhz_PP );
+	funPinMode( PA1, GPIO_CFGLR_OUT_10Mhz_PP );
 
 	funPinMode( LED, GPIO_CFGLR_OUT_10Mhz_PP );
 	funDigitalWrite( LED, !LED_ON );

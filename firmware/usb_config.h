@@ -6,14 +6,12 @@
 
 #define FUSB_BUFFERS_NUMBER   2 // Number of EP buffers (one for EP0, one per each IN/OUT, two for double)
 
-#define FUSB_EP1_MODE         1 // TX (IN)
-#define FUSB_EP2_MODE         -1 // RX (OUT)
+#define FUSB_EP1_MODE         FUSB_MODE_TX // TX (IN)
 #define USB_EP_TX             1
-#define USB_EP_RX             2
 #define FUSB_SUPPORTS_SLEEP   0
 #define FUSB_IO_PROFILE       0
 
-#define FUSB_HID_INTERFACES   2
+#define FUSB_HID_INTERFACES   1
 #define FUSB_CURSED_TURBO_DMA 0 // Hacky, but seems fine, shaves 2.5us off filling 64-byte buffers.
 #define FUSB_HID_USER_REPORTS 1
 #define FUSB_IO_PROFILE       0
@@ -36,10 +34,10 @@
 static const uint8_t device_descriptor[] = {
 	18, //bLength - Length of this descriptor
 	1,  //bDescriptorType - Type (Device)
-	0x00, 0x02, //bcdUSB - The highest USB spec version this device supports (USB1.1)
-	0x0, //bDeviceClass - Device Class
-	0x0, //bDeviceSubClass - Device Subclass
-	0x0, //bDeviceProtocol - Device Protocol  (000 = use config descriptor)
+	0x01, 0x01, //bcdUSB - The highest USB spec version this device supports (USB1.1)
+	0x03, //bDeviceClass - Device Class
+	0x00, //bDeviceSubClass - Device Subclass (Subclass = 0 = "None")
+	0x00, //bDeviceProtocol - Device Protocol  (00 = use config descriptor)
 	64, //bMaxPacketSize - Max packet size for EP0
 	(uint8_t)(FUSB_USB_VID), (uint8_t)(FUSB_USB_VID >> 8), //idVendor - ID Vendor
 	(uint8_t)(FUSB_USB_PID), (uint8_t)(FUSB_USB_PID >> 8), //idProduct - ID Product
@@ -55,7 +53,7 @@ static const uint8_t HIDAPIRepDesc[ ] =
 {
 	HID_USAGE_PAGE ( 0xff ), // Vendor-defined page.
 	HID_USAGE      ( 0x00 ),
-	HID_REPORT_SIZE ( 8 ),
+	HID_REPORT_SIZE ( 64 ),
 	HID_COLLECTION ( HID_COLLECTION_LOGICAL ),
 		HID_REPORT_COUNT   ( 7 ),
 		HID_REPORT_ID      ( 0xaa )
@@ -129,7 +127,7 @@ static const uint8_t config_descriptor[ ] =
     0x05,                                                   // bDescriptorType
     0x81,                                                   // bEndpointAddress: IN Endpoint 3
     0x03,                                                   // bmAttributes
-    0x40, 0x00,                                             // wMaxPacketSize
+    0x08, 0x00,                                             // wMaxPacketSize
     0xff,                                                   // bInterval: 255mS
 };
 
