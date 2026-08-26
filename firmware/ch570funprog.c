@@ -205,6 +205,7 @@ int main()
 	SystemInit();
 
 	funGpioInitAll();
+	Delay_Ms(10);
 
 	// Force reset.
 	funPinMode( LED, GPIO_CFGLR_OUT_10Mhz_PP );
