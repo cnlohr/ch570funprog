@@ -187,6 +187,7 @@ static __attribute__((noreturn)) void processLoop()
 			scratch_return = 1;
 		}
 
+		_Static_assert( USB_EP_TX == 1 );
 		// To service interrupt endpoint
 		uint32_t * buffer = (uint32_t*)USBFS_GetEPBufferIfAvailable( USB_EP_TX );
 		if( buffer )
@@ -194,6 +195,11 @@ static __attribute__((noreturn)) void processLoop()
 			buffer[0] = 0;
 			buffer[1] = 0;
 			USBFS_SendEndpoint( USB_EP_TX, 8 /* data length */ );
+
+static int bon;
+bon = !bon;
+	funDigitalWrite( LED, bon );
+
 		}
 	}
 }

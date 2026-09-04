@@ -125,7 +125,7 @@ static const uint8_t config_descriptor[ ] =
     /* Endpoint Descriptor (HIDAPI) */
     0x07,                                                   // bLength
     0x05,                                                   // bDescriptorType
-    0x81,                                                   // bEndpointAddress: IN Endpoint 3
+    0x81,                                                   // bEndpointAddress: IN Endpoint 1
     0x03,                                                   // bmAttributes
     0x08, 0x00,                                             // wMaxPacketSize
     0xff,                                                   // bInterval: 255mS
