@@ -105,8 +105,8 @@ static inline void ConfigureIOForRVSWD(void);
 #endif
 
 // Provided Basic functions
-static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value ) IRAM;
-static int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value ) IRAM;
+void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value ) IRAM;
+int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value ) IRAM;
 
 // More advanced functions built on lower level PHY.
 static int InitializeSWDSWIO( struct SWIOState * state );
@@ -284,7 +284,7 @@ static inline int ReadBitRVSWD( int t1coeff, int pinmaskD, int pinmaskC )
 }
 
 
-static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
+void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 {
 	int t1coeff = state->t1coeff;
 	int pinmaskD = state->pinmaskD;
@@ -369,7 +369,7 @@ static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t v
 }
 
 // returns 0 if no error, otherwise error.
-static int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
+int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 {
 	int t1coeff = state->t1coeff;
 	int pinmaskD = state->pinmaskD;

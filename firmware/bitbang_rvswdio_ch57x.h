@@ -8,6 +8,12 @@
 #ifndef _BITBANG_RVSWDIO_CH570_H
 #define _BITBANG_RVSWDIO_CH570_H
 
+#define GPIO_SetBitsMask(pin)             (*(&R32_PA_SET ) =  ((pin)))
+#define GPIO_ResetBitsMask(pin)           (*(&R32_PA_CLR ) =  ((pin)))
+#define GPIO_ReadPortPinMask(pin)         ((*(&R32_PA_PIN)) & (pin))
+#define funDigitalReadMask(pin)           !!GPIO_ReadPortPinMask(pin)
+#define funDigitalWriteMask( pin, value ) do{ if((value)==FUN_HIGH){GPIO_SetBitsMask(pin);} else if((value)==FUN_LOW){GPIO_ResetBitsMask(pin);} }while(0)
+
 static inline void Delay_Tiny_Inline( int n ) {
 	asm volatile( "\
 		1: \
@@ -27,34 +33,34 @@ void ConfigureIOForRVSWIO(void);
 static inline void Send1Bit(void)
 {
 	// 288-296ns low pulse. (Ideal period) - OK @ 2..15
-	R32_PA_DIR |= PIN_SWD;
-	R32_PA_CLR = PIN_SWD;
-	Delay_Tiny_Inline( 5 ); // Valid (no end break) 1 (100ns) .. 9 (500ns)
-	R32_PA_SET = PIN_SWD;
-	Delay_Tiny_Inline( 6 ); // Valid 0+
+	R32_PA_DIR |= PIN_SWD_MASK;
+	R32_PA_CLR = PIN_SWD_MASK;
+	Delay_Tiny_Inline( 4 ); // Valid (no end break) 1 (100ns) .. 9 (500ns)
+	R32_PA_SET = PIN_SWD_MASK;
+	Delay_Tiny_Inline( 3 ); // Valid 1-8
 }
 
 static inline void Send0Bit(void)
 {
 	// 888-904ns - OK @ 32 (At TPERIOD=48) - @48 (At TPERIOD=56)
 	// Oddly, also works at =20 for TPERIOD=56
-	R32_PA_DIR |= PIN_SWD;
-	R32_PA_CLR = PIN_SWD;
-	Delay_Tiny_Inline( 16 ); // Valid 10 (500ns) .. 40 (2us)
-	R32_PA_SET = PIN_SWD;	
-	Delay_Tiny_Inline( 6 ); // Valid 0+
+	R32_PA_DIR |= PIN_SWD_MASK;
+	R32_PA_CLR = PIN_SWD_MASK;
+	Delay_Tiny_Inline( 15 ); // Valid 9 (500ns) .. 40 (2us)
+	R32_PA_SET = PIN_SWD_MASK;	
+	Delay_Tiny_Inline( 6 ); // Valid 2+
 }
 
 static inline int ReadBit(void)
 {
-	R32_PA_CLR = PIN_SWD;
-	Delay_Tiny_Inline( 2 );
-	R32_PA_DIR &= ~PIN_SWD;
-	Delay_Tiny_Inline( 5 );
-	int r = !!(R32_PA_PIN&PIN_SWD);
-	R32_PA_SET = PIN_SWD;
+	R32_PA_CLR = PIN_SWD_MASK;
+	Delay_Tiny_Inline( 3 ); // valid 1-8 (was 2)
+	R32_PA_DIR &= ~PIN_SWD_MASK;
+	Delay_Tiny_Inline( 5 ); // valid 1-8 (was 5)
+	int r = !!(R32_PA_PIN&PIN_SWD_MASK);
+	R32_PA_SET = PIN_SWD_MASK;
 	Delay_Tiny_Inline( 12 );
-	R32_PA_DIR |= PIN_SWD;
+	R32_PA_DIR |= PIN_SWD_MASK;
 	return r;
 }
 
@@ -74,29 +80,36 @@ static void SendBitRVSWD( int val )
 	// Assume:
 	// SWD is in indeterminte state.
 	// SWC is HIGH
-	funDigitalWrite( PIN_SWC, 0 );
+	funDigitalWriteMask( PIN_SWC_MASK, 0 );
 	if( val )
 	{
-		funDigitalWrite( PIN_SWD, 1 );
+		funDigitalWriteMask( PIN_SWD_MASK, 1 );
 	}
 	else
 	{
-		funDigitalWrite( PIN_SWD, 0 );
+		funDigitalWriteMask( PIN_SWD_MASK, 0 );
 	}
-	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_10Mhz_PP );
+	//funPinMode( PIN_SWD_MASK, GPIO_CFGLR_OUT_10Mhz_PP );
+	*(&R32_PA_PD_DRV)  |= PIN_SWD_MASK;
+	*(&R32_PA_DIR )    |= PIN_SWD_MASK;
+
 	SWD_DELAY;
-	funDigitalWrite( PIN_SWC, 1 );
+	funDigitalWriteMask( PIN_SWC_MASK, 1 );
 	SWD_DELAY;
 }
 
 static int ReadBitRVSWD( void )
 {
-	funPinMode( PIN_SWD, GPIO_CFGLR_IN_PUPD );
-	funDigitalWrite( PIN_SWD, 1 );
-	funDigitalWrite( PIN_SWC, 0 );
+	//funPinMode( PIN_SWD_MASK, GPIO_CFGLR_IN_PUPD );
+	*(&R32_PA_PD_DRV)  &= ~PIN_SWD_MASK;
+	*(&R32_PA_DIR )    &= ~PIN_SWD_MASK;
+	*(&R32_PA_PU)      |= PIN_SWD_MASK;
+
+	funDigitalWriteMask( PIN_SWD_MASK, 1 );
+	funDigitalWriteMask( PIN_SWC_MASK, 0 );
 	SWD_DELAY;
-	int r = !!(funDigitalRead( PIN_SWD ));
-	funDigitalWrite( PIN_SWC, 1 );
+	int r = !!(funDigitalReadMask( PIN_SWD_MASK ));
+	funDigitalWriteMask( PIN_SWC_MASK, 1 );
 	SWD_DELAY;
 	return r;
 }
@@ -110,20 +123,23 @@ static void RVFinishRegop(void)
 	SendBitRVSWD( 0 ); // ??? Seems to have something to do with halting?
 
 
-	funDigitalWrite( PIN_SWC, 0 );
+	funDigitalWriteMask( PIN_SWC_MASK, 0 );
 	SWD_DELAY;
-	funDigitalWrite( PIN_SWD, 0 );
-	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_50Mhz_PP );
+	funDigitalWriteMask( PIN_SWD_MASK, 0 );
+//	funPinMode( PIN_SWD_MASK, GPIO_CFGLR_OUT_50Mhz_PP );
+	*(&R32_PA_PD_DRV)  |= PIN_SWD_MASK;
+	*(&R32_PA_DIR )    |= PIN_SWD_MASK;
+
 	SWD_DELAY;
-	funDigitalWrite( PIN_SWC, 1 );
+	funDigitalWriteMask( PIN_SWC_MASK, 1 );
 	SWD_DELAY;
-	funDigitalWrite( PIN_SWD, 1 );
+	funDigitalWriteMask( PIN_SWD_MASK, 1 );
 
 	Delay_Us(2); // Sometimes 2 is too short.
 	__enable_irq();
 }
 
-static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
+void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 {
 	__disable_irq();
 	if( state->opmode == 1 )
@@ -153,7 +169,7 @@ static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t v
 	else if( state->opmode == 2 )
 	{
 		uint32_t mask;
-		funDigitalWrite( PIN_SWD, 0 );
+		funDigitalWriteMask( PIN_SWD_MASK, 0 );
 		SWD_DELAY;
 		int parity = 1;
 		for( mask = 1<<6; mask; mask >>= 1 )
@@ -183,7 +199,7 @@ static void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t v
 }
 
 // returns 0 if no error, otherwise error.
-static int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
+int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 {
 	__disable_irq();
 	if( state->opmode == 1 )
@@ -213,7 +229,7 @@ static int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * v
 	else if( state->opmode == 2 )
 	{
 		int mask;
-		funDigitalWrite( PIN_SWD, 0 );
+		funDigitalWriteMask( PIN_SWD_MASK, 0 );
 		SWD_DELAY;
 		int parity = 0;
 		for( mask = 1<<6; mask; mask >>= 1 )

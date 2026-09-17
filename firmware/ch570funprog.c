@@ -8,6 +8,9 @@
 #define PIN_SWD PA2
 #define PIN_SWC PA3
 
+#define PIN_SWD_MASK (1<<2)
+#define PIN_SWC_MASK (1<<3)
+
 #define LED PA7
 #define LED_ON 0
 #define PIN_TARGETPOWER PA7
@@ -195,11 +198,6 @@ static __attribute__((noreturn)) void processLoop()
 			buffer[0] = 0;
 			buffer[1] = 0;
 			USBFS_SendEndpoint( USB_EP_TX, 8 /* data length */ );
-
-static int bon;
-bon = !bon;
-	funDigitalWrite( LED, bon );
-
 		}
 	}
 }
@@ -214,14 +212,19 @@ int main()
 	Delay_Ms(10);
 
 	// Force reset.
-	funPinMode( LED, GPIO_CFGLR_OUT_10Mhz_PP );
 	funDigitalWrite( LED, !LED_ON );
+	funPinMode( LED, GPIO_CFGLR_OUT_10Mhz_PP );
 
-	printf("USBFS starting...");
+	funDigitalWrite( PIN_SWD, 1 );
+	funDigitalWrite( PIN_SWC, 1 );
+	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_10Mhz_PP );
+	funPinMode( PIN_SWC, GPIO_CFGLR_OUT_10Mhz_PP );
+
+//	printf("USBFS starting...");
 
 	USBFSSetup();
 
-	printf("ok\n");
+//	printf("ok\n");
 
 	funDigitalWrite( LED, LED_ON );
 

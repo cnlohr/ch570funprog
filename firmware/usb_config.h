@@ -19,7 +19,7 @@
 #define FUSB_USER_HANDLERS    0
 #define FUSB_USE_DMA7_COPY    0
 #define FUSB_VDD_5V           FUNCONF_USE_5V_VDD
-#define FUSB_FROM_RAM         0
+#define FUSB_FROM_RAM         1
 
 #include "usb_defines.h"
 
@@ -54,38 +54,46 @@ static const uint8_t HIDAPIRepDesc[ ] =
 	HID_USAGE_PAGE ( 0xff ), // Vendor-defined page.
 	HID_USAGE      ( 0x00 ),
 	HID_REPORT_SIZE ( 64 ),
-	HID_COLLECTION ( HID_COLLECTION_LOGICAL ),
-		HID_REPORT_COUNT   ( 7 ),
-		HID_REPORT_ID      ( 0xaa )
-		HID_USAGE          ( 0x01 ),
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
-		HID_REPORT_COUNT   ( 127 ),
-		HID_REPORT_ID      ( 0xac )
-		HID_USAGE          ( 0x01 ),
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
-		HID_REPORT_COUNT   ( 78 ),
-		HID_REPORT_ID      ( 0xad )
-		HID_USAGE          ( 0x01 ),
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
-		HID_REPORT_COUNT_N ( 263, 2 ),
-		HID_REPORT_ID      ( 0xae )
-		HID_USAGE          ( 0x01 ),
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+	HID_COLLECTION( HID_COLLECTION_APPLICATION ),
+		HID_REPORT_COUNT( 8 ),
+		HID_USAGE( 0x01 ),
+		HID_INPUT( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+		HID_REPORT_COUNT( 8 ),
+		HID_USAGE( 0x01 ),
+		HID_OUTPUT( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+		HID_COLLECTION ( HID_COLLECTION_LOGICAL ),
+			HID_REPORT_COUNT   ( 7 ),
+			HID_REPORT_ID      ( 0xaa )
+			HID_USAGE          ( 0x01 ),
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+			HID_REPORT_COUNT   ( 127 ),
+			HID_REPORT_ID      ( 0xac )
+			HID_USAGE          ( 0x01 ),
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+			HID_REPORT_COUNT   ( 78 ),
+			HID_REPORT_ID      ( 0xad )
+			HID_USAGE          ( 0x01 ),
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
+			HID_REPORT_COUNT_N ( 263, 2 ),
+			HID_REPORT_ID      ( 0xae )
+			HID_USAGE          ( 0x01 ),
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ),
 
-		HID_REPORT_COUNT   ( 63 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
-		HID_REPORT_ID      ( 0xab )
-		HID_USAGE          ( 0x01 ),	
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
+			HID_REPORT_COUNT   ( 63 ), // For use with `hidapitester --vidpid 1209/D003 --open --read-feature 171`
+			HID_REPORT_ID      ( 0xab )
+			HID_USAGE          ( 0x01 ),	
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
 
-		// for reboot or internal terminal.
-		HID_REPORT_COUNT   ( 8 ),
-		HID_REPORT_ID      ( 0xe2 )
-		HID_USAGE          ( 0x01 ),	
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
-		HID_REPORT_COUNT   ( 8 ),
-		HID_REPORT_ID      ( 0xe1 )
-		HID_USAGE          ( 0x01 ),	
-		HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
+			// for reboot or internal terminal.
+			HID_REPORT_COUNT   ( 8 ),
+			HID_REPORT_ID      ( 0xe2 )
+			HID_USAGE          ( 0x01 ),	
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
+			HID_REPORT_COUNT   ( 8 ),
+			HID_REPORT_ID      ( 0xe1 )
+			HID_USAGE          ( 0x01 ),	
+			HID_FEATURE        ( HID_DATA | HID_VARIABLE | HID_ABSOLUTE ) ,
+		HID_COLLECTION_END,
 	HID_COLLECTION_END,
 };
 

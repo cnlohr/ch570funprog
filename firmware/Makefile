@@ -18,12 +18,12 @@ flash_fresh :
 # Below this is largely designed around the CH5xx
 
 go_into_bootloader :
-	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_device/usbhidtool && make VID=1209 PID=570f go_into_bootloader && cd .. )
+	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_hid/usbhidtool && make VID=1209 PID=570f go_into_bootloader && cd .. )
 
 flash_self : go_into_bootloader flash
 
 monitor_self :
-	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_device/usbhidtool && make VID=1209 PID=570f  usermonitor && cd .. )
+	(cd $(CH32FUN)/../examples_usb/USBFS/usbfs_hid/usbhidtool && make VID=1209 PID=570f  usermonitor && cd .. )
 
 flash : cv_flash
 clean : cv_clean
