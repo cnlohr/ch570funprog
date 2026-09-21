@@ -6,6 +6,9 @@ CH570-based programmer for CH32 microcontrollers.
 
 <img width="1883" height="935" alt="Image" src="https://github.com/user-attachments/assets/37eef7a6-dd0e-41a3-9c07-9184f502477f" />
 
+### Hardware Note
+ * You must connect an external 1.5k to 10k pull-up resistor between SWIO and VDD
+
 ### General Game Plan
 
 - [x] Be a cheap, minichlink-compatible programmer programming over USB
