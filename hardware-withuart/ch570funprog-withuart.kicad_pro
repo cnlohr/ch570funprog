@@ -178,6 +178,7 @@
         {
           "td_allow_use_two_tracks": true,
           "td_curve_segcount": 0,
+          "td_enabled": false,
           "td_height_ratio": 1.0,
           "td_length_ratio": 0.5,
           "td_maxheight": 2.0,
@@ -189,6 +190,7 @@
         {
           "td_allow_use_two_tracks": true,
           "td_curve_segcount": 0,
+          "td_enabled": false,
           "td_height_ratio": 1.0,
           "td_length_ratio": 0.5,
           "td_maxheight": 2.0,
@@ -200,6 +202,7 @@
         {
           "td_allow_use_two_tracks": true,
           "td_curve_segcount": 0,
+          "td_enabled": false,
           "td_height_ratio": 1.0,
           "td_length_ratio": 0.5,
           "td_maxheight": 2.0,
@@ -483,6 +486,7 @@
       "pin_to_pin": "warning",
       "power_pin_not_driven": "error",
       "same_local_global_label": "warning",
+      "same_local_global_power": "warning",
       "similar_label_and_power": "warning",
       "similar_labels": "warning",
       "similar_power": "warning",
@@ -530,8 +534,8 @@
     "meta": {
       "version": 5
     },
-    "net_colors": null,
-    "netclass_assignments": null,
+    "net_colors": {},
+    "netclass_assignments": {},
     "netclass_patterns": []
   },
   "pcbnew": {
@@ -539,7 +543,7 @@
       "gencad": "",
       "idf": "",
       "netlist": "",
-      "plot": "ch570funprogwithuart-revA",
+      "plot": "ch570funprogwithuart-revC",
       "pos_files": "ch570funprog-revA",
       "specctra_dsn": "",
       "step": "",
@@ -554,7 +558,7 @@
       "method": 0,
       "sort_order": 0
     },
-    "bom_export_filename": "ch570funprogwithuart-revA/${PROJECTNAME}.csv",
+    "bom_export_filename": "ch570funprogwithuart-revC/${PROJECTNAME}.csv",
     "bom_fmt_presets": [],
     "bom_fmt_settings": {
       "field_delimiter": ",",
@@ -698,7 +702,7 @@
         "uuid": "8b3ca9c1-ec01-472e-975f-b13c767b5c47"
       }
     ],
-    "used_designators": "U4,JP1,R8-10,H1-2,Y2,#PWR17,#PWR26-31",
+    "used_designators": "#PWR17,#PWR26-31,H1-2,JP1,R8-10,U4,Y2",
     "variants": []
   },
   "sheets": [
