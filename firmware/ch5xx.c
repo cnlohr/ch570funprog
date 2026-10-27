@@ -140,7 +140,7 @@ uint8_t ch5xx_flash_begin(struct SWIOState * iss, uint8_t cmd) {
 	if (iss->statetag != STTAG("FBEG")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, DMPROGBUF0, 0x00068323); // sb zero,6(a3);
@@ -164,7 +164,7 @@ void ch5xx_flash_end(struct SWIOState * iss) {
 	if (iss->statetag != STTAG("FEND")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, DMPROGBUF0, 0x00668703); // lb a4,6(a3);
@@ -185,7 +185,7 @@ void ch5xx_flash_out(struct SWIOState * iss, uint8_t addr)
 	if (iss->statetag != STTAG("FOUT")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, DMPROGBUF0, 0x00668703); // lb a4,6(a3);
@@ -209,7 +209,7 @@ uint8_t ch5xx_flash_in(struct SWIOState * iss)
 	if (iss->statetag != STTAG("FLIN")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, DMPROGBUF0, 0x00668703); // lb a4,6(a3);
@@ -327,7 +327,7 @@ int ch5xx_read_eeprom(struct SWIOState * iss, uint32_t addr, uint8_t* buffer, ui
 	if (iss->statetag != STTAG("FREP")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 
@@ -378,7 +378,7 @@ int ch5xx_read_options(struct SWIOState * iss, uint32_t addr, uint8_t* buffer) {
 	if (iss->statetag != STTAG("FOPT")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, BDMDATA0, 4);
@@ -446,7 +446,7 @@ int ch5xx_read_options_bulk(struct SWIOState * iss, uint32_t addr, uint8_t* buff
 	if (iss->statetag != STTAG("FOPB") || iss->statetag != STTAG("FVER")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, BDMDATA0, dmdata0_offset);
@@ -632,7 +632,7 @@ int ch5xx_microblob_init(struct SWIOState * iss, uint32_t start_addr) {
 
 	if ((iss->statetag & 0xff) != 'F') {
 		MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-		MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+		MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 		MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 	}
 	MCFWriteReg32(dev, BDMDATA0, dmdata0_offset); // DMDATA0 offset
@@ -722,7 +722,7 @@ int ch5xx_write_flash(struct SWIOState * iss, uint32_t start_addr, uint8_t* data
 		if (iss->statetag != STTAG("FWRT")) {
 			if ((iss->statetag & 0xff) != 'F') {
 				MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-				MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+				MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 				MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 			}
 			
@@ -856,7 +856,7 @@ int ch5xx_verify_data(struct SWIOState * iss, uint32_t addr, uint8_t* data, uint
 	if (iss->statetag != STTAG("FVER")) {
 		if ((iss->statetag & 0xff) != 'F') {
 			MCFWriteReg32(dev, DMABSTRACTAUTO, 0x00000000); // Disable Autoexec.
-			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA);
+			MCFWriteReg32(dev, BDMDATA0, R32_FLASH_DATA_A);
 			MCFWriteReg32(dev, DMCOMMAND, 0x00230000 | 0x100d); // Write a3 from DATA0.
 		}
 		MCFWriteReg32(dev, BDMDATA0, dmdata0_offset);

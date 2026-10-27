@@ -1,20 +1,21 @@
 #ifndef CH5XXH
 #define CH5XXH
 
-/*
-#define R8_SAFE_ACCESS_SIG     0x40001040
-#define R8_WDOG_COUNT          0x40001043
-#define R8_RESET_STATUS        0x40001044
-#define R8_GLOB_ROM_CFG        0x40001044
-#define R8_GLOB_CFG_INFO       0x40001045
-#define R8_RST_WDOG_CTRL       0x40001046
-#define R8_GLOB_RESET_KEEP     0x40001047
-#define R32_FLASH_DATA         0x40001800
-#define R32_FLASH_CONTROL      0x40001804
-#define R8_FLASH_DATA          0x40001804
-#define R8_FLASH_CTRL          0x40001806
-#define R8_FLASH_CFG           0x40001807
-*/
+
+#undef R8_SAFE_ACCESS_SIG
+#undef R8_WDOG_COUNT
+#undef R8_RESET_STATUS
+#undef R8_GLOB_ROM_CFG
+#undef R8_GLOB_CFG_INFO
+#undef R8_RST_WDOG_CTRL
+#undef R8_GLOB_RESET_KEEP
+#undef R32_FLASH_DATA
+#undef R32_FLASH_CONTROL
+#undef R8_FLASH_DATA
+#undef R8_FLASH_CTRL
+#undef R8_FLASH_CFG
+
+#define R32_FLASH_DATA_A         0x40001800
 
 #define MCFDetermineChipType(x)   DetermineChipTypeAndSectorInfo(x, NULL)
 #define MCFDelayUS             Delay_Us
