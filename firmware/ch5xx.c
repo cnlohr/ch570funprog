@@ -687,6 +687,7 @@ int ch5xx_write_flash_using_microblob(struct SWIOState * iss, uint32_t start_add
 		byte += 4;
 		// Wait every block to be written to flash and also new address set it takes ~1.5-2ms
 		if(!(byte & 0xFF)) {
+#if 0
 			do {
 				if ((timer++) > 200) {
 					return -1;
@@ -694,8 +695,9 @@ int ch5xx_write_flash_using_microblob(struct SWIOState * iss, uint32_t start_add
 				MCFReadReg32(dev, BDMDATA0, &dmdata0);
 			} while(dmdata0 != byte + start_addr);
 			timer = 0;
+#endif
 			do {
-				if ((timer++) > 100) {
+				if ((timer++) > 200) {
 					return -2;
 				}
 				MCFReadReg32(dev, BDMDATA0, &dmdata0);
