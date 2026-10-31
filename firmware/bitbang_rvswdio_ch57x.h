@@ -1,7 +1,4 @@
-// Implementation of platform specific functions in bitbang_rvswdio.h
-//
-// If you want the most up-to-date version of this, it will be stored in rv003usb.
-//
+// Implementation of platform specific functions in funprog_rvswdio.h
 
 #define SWD_DELAY ADD_N_NOPS( 5 );
 
@@ -21,16 +18,7 @@ static inline void Delay_Tiny_Inline( int n ) {
 		c.bnez %[n], 1b" : [n]"+r"(n) );
 }
 
-static inline void Send1Bit(void) __HIGH_CODE;
-static inline void Send0Bit(void) __HIGH_CODE;
-static inline int ReadBit(void) __HIGH_CODE;
-static void FinishBuffer(void);
-static void IssueBuffer(void);
-
-void ConfigureIOForRVSWD(void);
-void ConfigureIOForRVSWIO(void);
-
-static inline void Send1Bit(void)
+static inline void Send1BitSWIO(struct SWIOState * state)
 {
 	// 288-296ns low pulse. (Ideal period) - OK @ 2..15
 	R32_PA_DIR |= PIN_SWD_MASK;
@@ -40,7 +28,7 @@ static inline void Send1Bit(void)
 	Delay_Tiny_Inline( 3 ); // Valid 1-8
 }
 
-static inline void Send0Bit(void)
+static inline void Send0BitSWIO(struct SWIOState * state)
 {
 	// 888-904ns - OK @ 32 (At TPERIOD=48) - @48 (At TPERIOD=56)
 	// Oddly, also works at =20 for TPERIOD=56
@@ -51,7 +39,7 @@ static inline void Send0Bit(void)
 	Delay_Tiny_Inline( 6 ); // Valid 2+
 }
 
-static inline int ReadBit(void)
+static inline int ReadBitSWIO(struct SWIOState * state)
 {
 	R32_PA_CLR = PIN_SWD_MASK;
 	Delay_Tiny_Inline( 3 ); // valid 1-8 (was 2)
@@ -64,7 +52,9 @@ static inline int ReadBit(void)
 	return r;
 }
 
-static void IssueBuffer(void) { }
+static void IssueBuffer(void) {
+	Delay_Us(1);
+}
 
 static void FinishBuffer(void)
 {
@@ -75,7 +65,7 @@ static void FinishBuffer(void)
 // For SWD
 ////////////////////////////////////////////////////////////////
 
-static void SendBitRVSWD( int val )
+static void SendBitRVSWD( struct SWIOState * state, int val )
 {
 	// Assume:
 	// SWD is in indeterminte state.
@@ -98,7 +88,7 @@ static void SendBitRVSWD( int val )
 	SWD_DELAY;
 }
 
-static int ReadBitRVSWD( void )
+static int ReadBitRVSWD( struct SWIOState * state )
 {
 	//funPinMode( PIN_SWD_MASK, GPIO_CFGLR_IN_PUPD );
 	*(&R32_PA_PD_DRV)  &= ~PIN_SWD_MASK;
@@ -114,13 +104,13 @@ static int ReadBitRVSWD( void )
 	return r;
 }
 
-static void RVFinishRegop(void)
+static void RVFinishRegop( struct SWIOState * state )
 {
-	ReadBitRVSWD( ); // ???
-	ReadBitRVSWD( ); // ???
-	ReadBitRVSWD( ); // ???
-	SendBitRVSWD( 1 ); // 0 for register, 1 for value
-	SendBitRVSWD( 0 ); // ??? Seems to have something to do with halting?
+	ReadBitRVSWD( state ); // ???
+	ReadBitRVSWD( state ); // ???
+	ReadBitRVSWD( state ); // ???
+	SendBitRVSWD( state, 1 ); // 0 for register, 1 for value
+	SendBitRVSWD( state, 0 ); // ??? Seems to have something to do with halting?
 
 
 	funDigitalWriteMask( PIN_SWC_MASK, 0 );
@@ -145,22 +135,22 @@ void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 	if( state->opmode == 1 )
 	{
 		//printf( "WRITEREG: %02x %08x\n", command, value );
-		Send1Bit();
+		Send1BitSWIO( state );
 		uint32_t mask;
 		for( mask = 1<<6; mask; mask >>= 1 )
 		{
 			if( command & mask )
-				Send1Bit();
+				Send1BitSWIO( state );
 			else
-				Send0Bit();
+				Send0BitSWIO( state );
 		}
-		Send1Bit( );
+		Send1BitSWIO( state );
 		for( mask = 1<<31; mask; mask >>= 1 )
 		{
 			if( value & mask )
-				Send1Bit();
+				Send1BitSWIO( state );
 			else
-				Send0Bit();
+				Send0BitSWIO( state );
 		}
 
 		IssueBuffer();
@@ -176,25 +166,25 @@ void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 		{
 			int v = !!(command & mask);
 			parity ^= v;
-			SendBitRVSWD( v );
+			SendBitRVSWD( state, v );
 		}
-		SendBitRVSWD( 1 ); // Write = Set high
-		SendBitRVSWD( parity );
-		ReadBitRVSWD( ); // ???
-		ReadBitRVSWD( ); // Seems only need to be set for first transaction (We are ignoring that though)
-		ReadBitRVSWD( ); // ???
-		SendBitRVSWD( 0 ); // 0 for register, 1 for value.
-		SendBitRVSWD( 0 ); // ???  Seems to have something to do with halting.
+		SendBitRVSWD( state, 1 ); // Write = Set high
+		SendBitRVSWD( state, parity );
+		ReadBitRVSWD( state ); // ???
+		ReadBitRVSWD( state ); // Seems only need to be set for first transaction (We are ignoring that though)
+		ReadBitRVSWD( state ); // ???
+		SendBitRVSWD( state, 0 ); // 0 for register, 1 for value.
+		SendBitRVSWD( state, 0 ); // ???  Seems to have something to do with halting.
 
 		parity = 0;
 		for( mask = 1<<31; mask; mask >>= 1 )
 		{
 			int v = !!(value & mask);
 			parity ^= v;
-			SendBitRVSWD( v );
+			SendBitRVSWD( state, v );
 		}
-		SendBitRVSWD( parity );
-		RVFinishRegop();
+		SendBitRVSWD( state, parity );
+		RVFinishRegop( state );
 	}
 }
 
@@ -204,23 +194,23 @@ int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 	__disable_irq();
 	if( state->opmode == 1 )
 	{
-		Send1Bit();
+		Send1BitSWIO( state );
 		uint32_t mask;
 		for( mask = 1<<6; mask; mask >>= 1 )
 		{
 			if( command & mask )
-				Send1Bit();
+				Send1BitSWIO( state );
 			else
-				Send0Bit();
+				Send0BitSWIO( state );
 		}
-		Send0Bit( );
+		Send0BitSWIO( state );
 		uint32_t rv = 0;
 		int i;
 		for( i = 0; i < 32; i++ )
 		{
-			rv = (rv << 1) | ReadBit();
+			rv = (rv << 1) | ReadBitSWIO( state );
 		}
-		ReadBit(); // check bit.
+		ReadBitSWIO( state ); // check bit.
 		IssueBuffer();
 		FinishBuffer();
 
@@ -236,15 +226,15 @@ int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 		{
 			int v = !!(command & mask);
 			parity ^= v;
-			SendBitRVSWD( v );
+			SendBitRVSWD( state, v );
 		}
-		SendBitRVSWD( 0 ); // Read = Set low
-		SendBitRVSWD( parity );
-		ReadBitRVSWD( ); // ???
-		ReadBitRVSWD( ); // ???
-		ReadBitRVSWD( ); // ???
-		SendBitRVSWD( 0 ); // 0 for register, 1 for value
-		SendBitRVSWD( 0 ); // ??? Seems to have something to do with halting?
+		SendBitRVSWD( state, 0 ); // Read = Set low
+		SendBitRVSWD( state, parity );
+		ReadBitRVSWD( state ); // ???
+		ReadBitRVSWD( state ); // ???
+		ReadBitRVSWD( state ); // ???
+		SendBitRVSWD( state, 0 ); // 0 for register, 1 for value
+		SendBitRVSWD( state, 0 ); // ??? Seems to have something to do with halting?
 
 
 		uint32_t rval = 0;
@@ -253,7 +243,7 @@ int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 		for( i = 0; i < 32; i++ )
 		{
 			rval <<= 1;
-			int r = ReadBitRVSWD( );
+			int r = ReadBitRVSWD( state );
 			if( r == 1 )
 			{
 				rval |= 1;
@@ -261,25 +251,25 @@ int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 			}
 			if( r == 2 )
 			{
-				RVFinishRegop();
+				RVFinishRegop( state );
 				return -1;
 			}
 		}
 		memcpy( value, &rval, 4 );
 
-		if( ReadBitRVSWD( ) != parity )
+		if( ReadBitRVSWD( state ) != parity )
 		{
 			//BB_PRINTF_DEBUG( "Parity Failed\n" );
-			RVFinishRegop();
+			RVFinishRegop( state );
 			return -1;
 		}
 
-		RVFinishRegop();
+		RVFinishRegop( state );
 	}
 	return 0;
 }
 
-void ConfigureIOForRVSWD(void)
+void ConfigureIOForRVSWD( struct SWIOState * state )
 {
 	funDigitalWrite( PIN_SWC, 1 );
 	funPinMode( PIN_SWC, GPIO_CFGLR_OUT_10Mhz_PP );
@@ -287,12 +277,10 @@ void ConfigureIOForRVSWD(void)
 	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_10Mhz_PP );
 }
 
-void ConfigureIOForRVSWIO(void)
+void ConfigureIOForRVSWIO( struct SWIOState * state )
 {
 	funDigitalWrite( PIN_SWD, 1 );
 	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_10Mhz_PP );
 }
 
 #endif
-
-

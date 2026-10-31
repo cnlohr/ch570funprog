@@ -4,19 +4,20 @@
 #include "funconfig.h"
 #include "ch32fun.h"
 
-#define FUSB_BUFFERS_NUMBER   2 // Number of EP buffers (one for EP0, one per each IN/OUT, two for double)
+#define FUSB_BUFFERS_NUMBER   5 // Number of EP buffers (one for EP0, one per each IN/OUT, two for double)
+#define FUSB_EP1_MODE         USBFS_EP_MODE_TX // IN
+#define FUSB_EP2_MODE         USBFS_EP_MODE_RX // OUT
+#define FUSB_EP3_MODE         USBFS_EP_MODE_TX // IN
+#define FUSB_EP5_MODE         USBFS_EP_MODE_TX // IN
 
-#define FUSB_EP1_MODE         USBFS_EP_MODE_TX // TX (IN)
-#define USB_EP_TX             1
-#define FUSB_SUPPORTS_SLEEP   0
-#define FUSB_IO_PROFILE       0
+#define USB_EP_TX             5
 
 #define FUSB_HID_INTERFACES   1
 #define FUSB_CURSED_TURBO_DMA 0 // Hacky, but seems fine, shaves 2.5us off filling 64-byte buffers.
 #define FUSB_HID_USER_REPORTS 1
 #define FUSB_IO_PROFILE       0
 #define FUSB_USE_HPE          FUNCONF_ENABLE_HPE
-#define FUSB_USER_HANDLERS    0
+#define FUSB_USER_HANDLERS    1
 #define FUSB_USE_DMA7_COPY    0
 #define FUSB_VDD_5V           FUNCONF_USE_5V_VDD
 #define FUSB_FROM_RAM         1
@@ -103,17 +104,88 @@ static const uint8_t config_descriptor[ ] =
     /* Configuration Descriptor */
     0x09,                                                   // bLength
     0x02,                                                   // bDescriptorType
-    0x22, 0x00,                                             // wTotalLength
-    0x01,                                                   // bNumInterfaces (1)
+    0x5c, 0x00,                                             // wTotalLength
+    0x03,                                                   // bNumInterfaces (3)
     0x01,                                                   // bConfigurationValue
     0x00,                                                   // iConfiguration
     0xA0,                                                   // bmAttributes: Bus Powered; Remote Wakeup
     0x32,                                                   // MaxPower: 100mA
 
+    0x09,        // bLength
+    0x04,        // bDescriptorType - Interface
+    0x00,        // bInterfaceNumber - 0
+    0x00,        // bAlternateSetting
+    0x01,        // bNumEndpoints - 1
+    0x02,        // bInterfaceClass - CDC
+    0x02,        // bInterfaceSubClass - Abstract Control Model (Table 4 in CDC120.pdf)
+    0x01,        // bInterfaceProtocol - AT Commands: V.250 etc (Table 5)
+    0x00,        // iInterface (String Index)
+
+    // Setting up CDC interface (Table 18)
+    0x05,        // bLength
+    0x24,        // bDescriptorType - CS_INTERFACE (Table 12)
+    0x00,        // bDescriptorSubType - Header Functional Descriptor (Table 13)
+    0x10, 0x01,  // bcdCDC - USB version - USB1.1
+    // Call Management Functional Descriptor
+    0x05,        // bLength
+    0x24,        // bDescriptorType - CS_INTERFACE
+    0x01,        // bDescriptorSubType - Call Management Functional Descriptor (Table 13)
+    0x00,        // bmCapabilities: (Table 3 in PSTN120.pdf)
+    // Bit 0 — Device handles call management itself:
+    //  1 = device handles call management (e.g. call setup, termination, etc.)
+    //  0 = host handles it
+    // Bit 1 — Device can send/receive call management information over a Data Class interface:
+    //  1 = can use the Data Class interface for call management
+    //  0 = must use the Communication Class interface
+    0x01,        // bDataInterface - Indicates that multiplexed commands are handled via data interface 01h (same value as used in the UNION Functional Descriptor)
+    // Abstract Control Management Functional Descriptor
+    0x04,        // bLength
+    0x24,        // bDescriptorType - CS_INTERFACE
+    0x02,        // bDescriptorSubType - Abstract Control Management Functional Descriptor (Table 13)
+    0x02,        // bmCapabilities - Device supports the request combination of Set_Line_Coding, Set_Control_Line_State, Get_Line_Coding, and the notification Serial_State (Table 4 in PSTN120.pdf)
+    // Union Descriptor Functional Descriptor
+    0x05,        // bLength
+    0x24,        // bDescriptorType - CS_INTERFACE
+    0x06,        // bDescriptorSubType - Union Descriptor Functional Descriptor (Table 13)
+    0x00,        // bControlInterface (Interface number of the control (Communications Class) interface)
+    0x01,        // bSubordinateInterface0 (Interface number of the subordinate (Data Class) interface)
+    // Setting up EP1 for CDC config interface
+    0x07,        // bLength
+    0x05,        // bDescriptorType (Endpoint)
+    0x81,        // bEndpointAddress (IN/D2H)
+    0x03,        // bmAttributes (Interrupt)
+    0x40, 0x00,  // wMaxPacketSize 64
+    0x01,        // bInterval 1 (unit depends on device speed)
+
+    // Transmission interface with two bulk endpoints
+    0x09,        // bLength
+    0x04,        // bDescriptorType (Interface)
+    0x01,        // bInterfaceNumber 1
+    0x00,        // bAlternateSetting
+    0x02,        // bNumEndpoints 2
+    0x0A,        // bInterfaceClass
+    0x00,        // bInterfaceSubClass
+    0x00,        // bInterfaceProtocol - Transparent
+    0x00,        // iInterface (String Index)
+    // EP2 - device to host
+    0x07,        // bLength
+    0x05,        // bDescriptorType (Endpoint)
+    0x02,        // bEndpointAddress (OUT/H2D)
+    0x02,        // bmAttributes (Bulk)
+    0x40, 0x00,  // wMaxPacketSize 64
+    0x00,        // bInterval 0 (unit depends on device speed)
+    // EP3 - host to device
+    0x07,        // bLength
+    0x05,        // bDescriptorType (Endpoint)
+    0x83,        // bEndpointAddress (IN/D2H)
+    0x02,        // bmAttributes (Bulk)
+    0x40, 0x00,  // wMaxPacketSize 64
+    0x00,        // bInterval 0 (unit depends on device speed)
+
     /* Interface Descriptor (HIDAPI) */
     0x09,                                                   // bLength
     0x04,                                                   // bDescriptorType
-    0x00,                                                   // bInterfaceNumber
+    0x02,                                                   // bInterfaceNumber
     0x00,                                                   // bAlternateSetting
     0x01,                                                   // bNumEndpoints
     0x03,                                                   // bInterfaceClass
@@ -133,7 +205,7 @@ static const uint8_t config_descriptor[ ] =
     /* Endpoint Descriptor (HIDAPI) */
     0x07,                                                   // bLength
     0x05,                                                   // bDescriptorType
-    0x81,                                                   // bEndpointAddress: IN Endpoint 1
+    0x85,                                                   // bEndpointAddress: IN Endpoint 1
     0x03,                                                   // bmAttributes
     0x08, 0x00,                                             // wMaxPacketSize
     0xff,                                                   // bInterval: 255mS
@@ -175,9 +247,9 @@ const static struct descriptor_list_struct {
 	{0x00000100, device_descriptor, sizeof(device_descriptor)},
 	{0x00000200, config_descriptor, sizeof(config_descriptor)},
 	// interface number // 2200 for hid descriptors.
-	{0x00002200, HIDAPIRepDesc, sizeof(HIDAPIRepDesc)},
+	{0x00022200, HIDAPIRepDesc, sizeof(HIDAPIRepDesc)},
 
-	{0x00002100, config_descriptor + 18, 9 }, // Not sure why, this seems to be useful for Windows + Android.
+	{0x00022100, config_descriptor + 76, 9 }, // Not sure why, this seems to be useful for Windows + Android.
 
 	{0x00000300, (const uint8_t *)&string0, 4},
 	{0x04090301, (const uint8_t *)&string1, string1.bLength},
