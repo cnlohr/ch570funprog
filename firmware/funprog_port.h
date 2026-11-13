@@ -24,11 +24,24 @@
 #define SLOW_DOWN_PROTOCOL
 
 // Platform dependatnt attribute to put functions in RAM
-#define IRAM __HIGH_CODE
+// using .srodata instead of .highcode saves some space
+// adding "used" trades some space (260 bytes) for increased performance
+#define IRAM __attribute__((section(".srodata"), used))
 
 void EnableMCO( int use_apll, int sdm0, int sdm1, int sdm2, int odiv )
 {
-  return;
+	return;
+}
+
+void VendorCommand( const char * buffer, int len )
+{
+	if( len > 1 && (buffer[0] == 'u' || buffer[0] == 'U') )
+	{
+		if( buffer[1] == '0' ) enable_uart(0);
+		else if( buffer[1] == '1' ) enable_uart(1);
+
+		if( buffer[0] == 'U' ) update_storage( uart_enabled );
+	}
 }
 
 #endif

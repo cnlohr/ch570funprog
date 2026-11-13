@@ -2,7 +2,7 @@ all : flash
 
 TARGET:=ch570funprog
 TARGET_MCU:=CH570
-ADDITIONAL_C_FILES:=../ch32fun/extralibs/fsusb.c
+ADDITIONAL_C_FILES:=../ch32fun/extralibs/fsusb.c flash_storage.c uart_cdc.c
 include ../ch32fun/ch32fun/ch32fun.mk
 
 install_udev_rules : 

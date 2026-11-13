@@ -1,6 +1,23 @@
 // Implementation of platform specific functions in funprog_rvswdio.h
+// #include "funconfig.h"
 
+#if FUNCONF_SYSTEM_CORE_CLOCK == 60000000
+#define SWDIO_T1 3
+#define SWDIO_T2 4
+#define SWDIO_T3 5
+#define SWDIO_T4 6
+#define SWDIO_T5 12
+#define SWDIO_T6 15
 #define SWD_DELAY ADD_N_NOPS( 5 );
+#elif FUNCONF_SYSTEM_CORE_CLOCK == 100000000
+#define SWDIO_T1 5
+#define SWDIO_T2 7
+#define SWDIO_T3 8
+#define SWDIO_T4 10
+#define SWDIO_T5 20
+#define SWDIO_T6 24
+#define SWD_DELAY ADD_N_NOPS( 10 );
+#endif
 
 #ifndef _BITBANG_RVSWDIO_CH570_H
 #define _BITBANG_RVSWDIO_CH570_H
@@ -23,9 +40,9 @@ static inline void Send1BitSWIO(struct SWIOState * state)
 	// 288-296ns low pulse. (Ideal period) - OK @ 2..15
 	R32_PA_DIR |= PIN_SWD_MASK;
 	R32_PA_CLR = PIN_SWD_MASK;
-	Delay_Tiny_Inline( 4 ); // Valid (no end break) 1 (100ns) .. 9 (500ns)
+	Delay_Tiny_Inline( SWDIO_T2 ); // Valid (no end break) 1 (100ns) .. 9 (500ns)
 	R32_PA_SET = PIN_SWD_MASK;
-	Delay_Tiny_Inline( 3 ); // Valid 1-8
+	Delay_Tiny_Inline( SWDIO_T3 ); // Valid 1-8
 }
 
 static inline void Send0BitSWIO(struct SWIOState * state)
@@ -34,20 +51,20 @@ static inline void Send0BitSWIO(struct SWIOState * state)
 	// Oddly, also works at =20 for TPERIOD=56
 	R32_PA_DIR |= PIN_SWD_MASK;
 	R32_PA_CLR = PIN_SWD_MASK;
-	Delay_Tiny_Inline( 15 ); // Valid 9 (500ns) .. 40 (2us)
+	Delay_Tiny_Inline( SWDIO_T6 ); // Valid 9 (500ns) .. 40 (2us)
 	R32_PA_SET = PIN_SWD_MASK;	
-	Delay_Tiny_Inline( 6 ); // Valid 2+
+	Delay_Tiny_Inline( SWDIO_T4 ); // Valid 2+
 }
 
 static inline int ReadBitSWIO(struct SWIOState * state)
 {
 	R32_PA_CLR = PIN_SWD_MASK;
-	Delay_Tiny_Inline( 3 ); // valid 1-8 (was 2)
+	Delay_Tiny_Inline( SWDIO_T1 ); // valid 1-8 (was 2)
 	R32_PA_DIR &= ~PIN_SWD_MASK;
-	Delay_Tiny_Inline( 5 ); // valid 1-8 (was 5)
+	Delay_Tiny_Inline( SWDIO_T3 ); // valid 1-8 (was 5)
 	int r = !!(R32_PA_PIN&PIN_SWD_MASK);
 	R32_PA_SET = PIN_SWD_MASK;
-	Delay_Tiny_Inline( 12 );
+	Delay_Tiny_Inline( SWDIO_T5 );
 	R32_PA_DIR |= PIN_SWD_MASK;
 	return r;
 }
@@ -67,6 +84,9 @@ static void FinishBuffer(void)
 
 static void SendBitRVSWD( struct SWIOState * state, int val )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return; // Don't touch PA2/3 pins when UART is enabled
+#endif
 	// Assume:
 	// SWD is in indeterminte state.
 	// SWC is HIGH
@@ -90,6 +110,9 @@ static void SendBitRVSWD( struct SWIOState * state, int val )
 
 static int ReadBitRVSWD( struct SWIOState * state )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return 0;
+#endif
 	//funPinMode( PIN_SWD_MASK, GPIO_CFGLR_IN_PUPD );
 	*(&R32_PA_PD_DRV)  &= ~PIN_SWD_MASK;
 	*(&R32_PA_DIR )    &= ~PIN_SWD_MASK;
@@ -106,6 +129,9 @@ static int ReadBitRVSWD( struct SWIOState * state )
 
 static void RVFinishRegop( struct SWIOState * state )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return;
+#endif
 	ReadBitRVSWD( state ); // ???
 	ReadBitRVSWD( state ); // ???
 	ReadBitRVSWD( state ); // ???
@@ -131,6 +157,9 @@ static void RVFinishRegop( struct SWIOState * state )
 
 void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return;
+#endif
 	__disable_irq();
 	if( state->opmode == 1 )
 	{
@@ -191,6 +220,9 @@ void MCFWriteReg32( struct SWIOState * state, uint8_t command, uint32_t value )
 // returns 0 if no error, otherwise error.
 int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return 0;
+#endif
 	__disable_irq();
 	if( state->opmode == 1 )
 	{
@@ -271,6 +303,9 @@ int MCFReadReg32( struct SWIOState * state, uint8_t command, uint32_t * value )
 
 void ConfigureIOForRVSWD( struct SWIOState * state )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return;
+#endif
 	funDigitalWrite( PIN_SWC, 1 );
 	funPinMode( PIN_SWC, GPIO_CFGLR_OUT_10Mhz_PP );
 	funDigitalWrite( PIN_SWD, 1 );
@@ -279,6 +314,9 @@ void ConfigureIOForRVSWD( struct SWIOState * state )
 
 void ConfigureIOForRVSWIO( struct SWIOState * state )
 {
+#if defined(HW_VERSION) && HW_VERSION==1
+	if( uart_enabled ) return;
+#endif
 	funDigitalWrite( PIN_SWD, 1 );
 	funPinMode( PIN_SWD, GPIO_CFGLR_OUT_10Mhz_PP );
 }

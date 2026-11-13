@@ -1,7 +1,8 @@
 #ifndef PROGRAMMER_CONFIG_H
 #define PROGRAMMER_CONFIG_H
 
-#define DEBUG_PRINT              1
+#define DEBUG_PRINT              0
+#define HW_VERSION               1
 
 #define CH5xx_SUPPORT            1
 #define CH5xx_EEPROM             1
