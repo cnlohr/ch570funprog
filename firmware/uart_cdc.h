@@ -20,8 +20,8 @@
 #undef UART
 #define UART(n)             ((UART_TypeDef *)UART_BASE_ADDR(n))
 
-#define UART_TX_BUF_SIZE    512
-#define UART_RX_BUF_SIZE    512
+#define UART_TX_BUF_SIZE    256
+#define UART_RX_BUF_SIZE    256
 #define UART_USB_TIMEOUT    600
 #define UART_ZERO_TIMEOUT   60
 #define UART_RX_TIMEOUT     3

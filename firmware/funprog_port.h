@@ -21,8 +21,6 @@
 #define DELAY_MS(n) Delay_Ms(n)
 #define DELAY_US(n) Delay_Us(n)
 
-#define SLOW_DOWN_PROTOCOL
-
 // Platform dependatnt attribute to put functions in RAM
 // using .srodata instead of .highcode saves some space
 // adding "used" trades some space (260 bytes) for increased performance
