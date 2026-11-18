@@ -23,8 +23,8 @@
 // Allow reading and writing to the scratchpad via HID control messages.
 // Can we make them smaller? We have maximum allowed size in the descriptor of 264 bytes
 // We are running low on RAM, so come back here when it becomes critical
-__attribute__ ((aligned(4))) uint8_t scratch[264];
-__attribute__ ((aligned(4))) uint8_t retbuff[264];
+__attribute__ ((aligned(4))) uint8_t scratch[268];
+__attribute__ ((aligned(4))) uint8_t retbuff[268];
 
 volatile uint32_t usb_pending = 0;
 volatile uint32_t scratch_return = 0;
